@@ -10,6 +10,10 @@ function App() {
   const [height, setHeight] = useState("");
   const [horizontalAxis,setHorizontalAxis] = useState([]);
   const [verticalAxis,setVerticalAxis] = useState([]);
+  const [startingPosition,setStartingPosition] = useState([]);
+  const [spritePosition,setSpritePosition] = useState([]);
+  const [displaySpritePosition,setdisplaySpritePosition] = useState(false);
+
  
    
   const gameBoard = useRef();
@@ -20,20 +24,27 @@ function App() {
 
   useEffect(()=>{
        console.log('hey1')
-  if (horizontalAxis.length>0 &verticalAxis.length>0) {
-    console.log(gameBoard.current.childNodes[0].childNodes[0].style.backgroundColor='red')
-   }
-  },[horizontalAxis])
+       console.log(width)
+
+
+       getStartingPosition(displaySpritePosition)
+       generateRandomSpritePositions(displaySpritePosition);
+   
+  },[displaySpritePosition,spritePosition])
  
   const startGame=()=>{
     console.log(width,height)
     let amountOfSquares = Array.from({length: width}, (v, i) => i);
     let amountOfSquareRows = Array.from({length: height}, (v, i) => i);
-    setHorizontalAxis([...amountOfSquares])
+    setHorizontalAxis(horizontalAxis=>[horizontalAxis,...amountOfSquares])
     setVerticalAxis([...amountOfSquareRows])
-    console.log(horizontalAxis)
-
+    setdisplaySpritePosition(true)
    
+    let coordinateX = Math.round(width / 2);
+   let coordinateY = Math.round(height / 2);
+  
+  //  setStartingPosition(startingPosition.concat([coordinateX,coordinateY]))
+  //  getStartingPosition()
     
   }
   let squares
@@ -41,18 +52,68 @@ function App() {
   if (horizontalAxis.length > 0) {
       squares = (
         <div style={{display:'flex'}}>
-         {horizontalAxis.map(()=><Square />)}
+         {horizontalAxis.map((s)=><Square key={s} />)}
        </div>
       )
    }
+
+ 
   
-  let generateRandomSpritePositions=(coordinateX,coordinateY)=>{
+  let generateRandomSpritePositions=(horizontal)=>{
+    //  let xAxis = Math.floor(Math.random() * width);
+    //  let yAxis = Math.floor(Math.random() * height);
+    if (displaySpritePosition) {
+      let x = 0
+      let points=[]
+      do {
+       let xAxis = Math.floor(Math.random() * width);
+       let yAxis = Math.floor(Math.random() * height);
+       let point=[xAxis,yAxis];
+       points.push();
+       points.push(point) 
+ 
+       console.log(points)
+ 
+        
+       x++
+      } while (x < height);
      
+      console.log(startingPosition)
+      points.map(point=>{
+       gameBoard.current.childNodes[point[1]].childNodes[point[0]].style.backgroundColor='blue'
+      })
+      setSpritePosition([...spritePosition,...points])
+      setdisplaySpritePosition(false)
+    }
+    
+
+    
+
   } 
 
- let setStartingPosition=()=>{
-
+ let getStartingPosition=(displaySpritePosition)=>{
+  
+  if (displaySpritePosition) {
+    let coordinateX = Math.round(width / 2);
+    let coordinateY = Math.round(height / 2);
+   
+    setStartingPosition(startingPosition.concat([coordinateX,coordinateY]))
+    gameBoard.current.childNodes[coordinateY-1].childNodes[coordinateX-1].firstChild.style.backgroundColor='red'
   }
+  
+ 
+
+ }
+
+ let getSpritePositions=()=>{
+     if (spritePosition.length>0) {
+       console.log('sprite') 
+     }
+ }
+
+ getSpritePositions()
+
+
 
   return (
     <div className="App">
@@ -67,7 +128,7 @@ function App() {
           Start Game
         </Button>
       </div>
-      
+       <p>{width}</p>
       <div style={{display:'flex',justifyContent:'center'}}>
          <div style={{marginTop:'50px'}} ref={gameBoard}>
           {verticalAxis.map(()=>squares)}
