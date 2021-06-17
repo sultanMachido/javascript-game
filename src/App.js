@@ -13,6 +13,8 @@ function App() {
   const [startingPosition, setStartingPosition] = useState([]);
   const [spritePosition, setSpritePosition] = useState([]);
   const [displaySpritePosition, setdisplaySpritePosition] = useState(false);
+  const [left, setLeft] = useState(4);
+  const [leftButton, setLeftButton] = useState(false);
 
   const gameBoard = useRef();
   // const gameBoard = useRef();
@@ -21,18 +23,18 @@ function App() {
   // }
 
   useEffect(() => {
-    console.log("hey1");
-    console.log(width);
+    
 
-    getStartingPosition(displaySpritePosition);
+    getStartingPosition(displaySpritePosition,left);
     generateRandomSpritePositions(displaySpritePosition);
-  }, [displaySpritePosition, spritePosition]);
+    goLeft(left,displaySpritePosition)
+  }, [displaySpritePosition, spritePosition,left]);
 
   const startGame = () => {
     console.log(width, height);
     let amountOfSquares = Array.from({ length: width }, (v, i) => i);
     let amountOfSquareRows = Array.from({ length: height }, (v, i) => i);
-    setHorizontalAxis((horizontalAxis) => [horizontalAxis, ...amountOfSquares]);
+    setHorizontalAxis([...amountOfSquares]);
     setVerticalAxis([...amountOfSquareRows]);
     setdisplaySpritePosition(true);
 
@@ -54,7 +56,7 @@ function App() {
     );
   }
 
-  let generateRandomSpritePositions = (horizontal) => {
+  let generateRandomSpritePositions = (displaySpritePosition) => {
     //  let xAxis = Math.floor(Math.random() * width);
     //  let yAxis = Math.floor(Math.random() * height);
     if (displaySpritePosition) {
@@ -78,20 +80,30 @@ function App() {
           point[0]
         ].style.backgroundColor = "blue";
       });
-      setSpritePosition([...spritePosition, ...points]);
+      console.log(points)
+      setSpritePosition([...points]);
       setdisplaySpritePosition(false);
+      setLeftButton(true)
     }
   };
 
-  let getStartingPosition = (displaySpritePosition) => {
+  let getStartingPosition = (displaySpritePosition,left) => {
+    let coordinateX = Math.round(width / 2);
+    let coordinateY = Math.round(height / 2);
     if (displaySpritePosition) {
-      let coordinateX = Math.round(width / 2);
-      let coordinateY = Math.round(height / 2);
+    
 
       setStartingPosition(startingPosition.concat([coordinateX, coordinateY]));
       gameBoard.current.childNodes[coordinateY - 1].childNodes[
         coordinateX - 1
       ].firstChild.style.backgroundColor = "red";
+    }else if(left>4){
+      // gameBoard.current.childNodes[coordinateY - 1].childNodes[
+      //   coordinateX - 1
+      // ].firstChild.style.left=left+'px'
+      console.log(spritePosition)
+      getPathToFollow(startingPosition,spritePosition)
+      move(coordinateX,coordinateY)
     }
   };
 
@@ -99,54 +111,171 @@ function App() {
     if (spritePosition.length > 0) {
       console.log(spritePosition);
       console.log(startingPosition);
-      spritePosition.map(point=>move(startingPosition,point))
+      // spritePosition.map(point=>move(startingPosition,point))
     }
   };
-  let move = (currentPosition, destination) => {
-    const [destX, destY] = [destination];
-    const [locatnX, locatnY] = [currentPosition];
+  let move = (coordinateX,coordinateY) => {
+      
+     let start = gameBoard.current.childNodes[coordinateY - 1].childNodes[coordinateX - 1].firstChild.style
 
-    //horizontal movement
-    if (destX > locatnX) {
-      let count = destX - locatnX
-      for (let index = 0; index < count; index++) {
-        gameBoard.current.childNodes[locatnY].childNodes[
-          locatnX
-        ].firstChild.style.left = "20px";
+    var pos = 0;
+    clearInterval(id);
+    id = setInterval(frame, 10);
+    function frame() {
+      if (pos == 30) {
+        clearInterval(id);
+      } else {
+        pos++; 
+        // elem.style.top = pos + 'px'; 
+        start.left = pos + 'px'; 
+        // elem.style.right = pos + 'px'; 
       }
-      setStartingPosition([...startingPosition,[destX,locatnY]])
-    } else if (destX < locatnX) {
-      let count = locatnX - destX
-      for (let index = 0; index < count; index++) {
-        gameBoard.current.childNodes[locatnY].childNodes[
-          locatnX
-        ].firstChild.style.right = "20px";
-      }
-      setStartingPosition([...startingPosition,[destX,locatnY]])
-    } else {
     }
+   
+  }
 
-    //vertical movement
-    if (destY > locatnY) {
-      let count = destY - locatnY
-      for (let index = 0; index < count; index++) {
-        gameBoard.current.childNodes[locatnY].childNodes[
-          locatnX
-        ].firstChild.style.bottom = "20px";
-      }
-      setStartingPosition([...startingPosition,[destX,destY]])
-    } else if (destY < locatnY) {
-      let count = locatnY - destY
-      for (let index = 0; index < count; index++) {
-        gameBoard.current.childNodes[locatnY].childNodes[
-          locatnX
-        ].firstChild.style.top = "20px";
-      }
-      setStartingPosition([...startingPosition,[destX,destY]])
-    } else {
-    }
-  };
+   
+  // };
   getSpritePositions();
+  
+  let id = null
+  // function myMove() {
+  //   // var elem = document.getElementById("myAnimation");   
+  //   var pos = 0;
+  //   clearInterval(id);
+  //   id = setInterval(frame, 10);
+  //   function frame() {
+  //     if (pos == 350) {
+  //       clearInterval(id);
+  //     } else {
+  //       pos++; 
+  //       elem.style.top = pos + 'px'; 
+  //       elem.style.left = pos + 'px'; 
+  //       elem.style.right = pos + 'px'; 
+  //     }
+  //   }
+  // }
+
+
+ let  getPathToFollow=(currentPosition,points)=>{
+           let currentPoint = [...currentPosition]
+           let path = [];
+           let moveX ={
+              steps:'',
+              direction:''
+           }
+
+           let moveY ={
+            steps:'',
+            direction:''
+         }
+
+         let count = 0
+
+         console.log(currentPosition,points)
+          //  let [locatnX,locatnY]=currentPoint;
+          //  console.log(locatnX,'current')
+           points.map(point=>{
+               console.log(currentPoint[0],'here X')
+               console.log(currentPoint[1],'here Y')
+               console.log(point[0],'dest Y')
+               if (currentPoint[0] < point[0]) {
+              
+                  let steps = point[0] - currentPoint[0];
+                  let direction = 'right';
+
+                  moveX.steps = steps;
+                  moveX.direction = direction
+                  console.log(points)
+                  console.log(moveX,'right')
+               }
+
+               if (currentPoint[0] > point[0]) {
+                let steps = currentPoint[0] - point[0];
+                let direction = 'left';
+
+                moveX.steps = steps;
+                moveX.direction = direction
+                console.log(points)
+                  console.log(moveX,'left')
+               }
+
+               if (currentPoint[0] === point[0]) {
+                let steps = 0;
+                let direction = 'none';
+
+                moveX.steps = steps;
+                moveX.direction = direction
+                console.log(points)
+                  console.log(moveX,'none X')
+               }
+
+
+             if (currentPoint[1] < point[1]) {
+              let steps = point[1] - currentPoint[1];
+              let direction = 'down';
+
+              moveY.steps = steps;
+              moveY.direction = direction
+              console.log(points)
+                  console.log(moveY,'down')
+             }
+
+             if (currentPoint[1] > point[1]) {
+              let steps = currentPoint[1] - point[1];
+              let direction = 'top';
+
+              moveY.steps = steps;
+              moveY.direction = direction
+              console.log(points)
+                  console.log(moveY,'top')
+           }
+
+           if (currentPoint[1] === point[1]) {
+            let steps = 0;
+            let direction = 'none';
+
+            moveY.steps = steps;
+            moveY.direction = direction
+            console.log(points)
+            console.log(moveY,'none Y')
+           }
+           console.log(moveX,moveY,'moves')
+
+           let x ={...moveX}
+           let y ={...moveY}
+           count++
+           path.push([x,y]);
+           console.log(path)
+          //  currentPoint = [point[0],point[1]];
+          currentPoint[0] = point[0];
+          currentPoint[1] = point[1];
+           console.log(currentPoint,'current position')
+        })
+        console.log(currentPoint)
+        console.log(path)
+        return path
+  }
+
+  let goLeft=()=>{
+    if (left>4 && displaySpritePosition) {
+    //   gameBoard.current.childNodes[5].childNodes[5].firstChild.style.backgroundColor='green'
+    // gameBoard.current.childNodes[5].childNodes[5].firstChild.style.left=left+'px'
+
+    
+    
+    }
+  }
+
+  let moveLeft=()=>{
+    // console.log(gameBoard.current.childNodes[5].childNodes[5].firstChild.style,'Check')
+  setLeft(left+1)
+      
+         
+   
+    
+    
+}
 
   return (
     <div className="App">
@@ -172,8 +301,11 @@ function App() {
         <Button variant="contained" color="primary" onClick={startGame}>
           Start Game
         </Button>
+        <Button variant="contained" color="primary" onClick={moveLeft}>
+          Move left
+        </Button>
       </div>
-      <p>{width}</p>
+      <p>{left}</p>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <div style={{ marginTop: "50px" }} ref={gameBoard}>
           {verticalAxis.map(() => squares)}
