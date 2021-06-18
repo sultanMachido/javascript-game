@@ -23,12 +23,10 @@ function App() {
   // }
 
   useEffect(() => {
-    
-
-    getStartingPosition(displaySpritePosition,left);
+    getStartingPosition(displaySpritePosition, left);
     generateRandomSpritePositions(displaySpritePosition);
-    goLeft(left,displaySpritePosition)
-  }, [displaySpritePosition, spritePosition,left]);
+    goLeft(left, displaySpritePosition);
+  }, [displaySpritePosition, spritePosition, left]);
 
   const startGame = () => {
     console.log(width, height);
@@ -80,202 +78,174 @@ function App() {
           point[0]
         ].style.backgroundColor = "blue";
       });
-      console.log(points)
+      console.log(points);
       setSpritePosition([...points]);
       setdisplaySpritePosition(false);
-      setLeftButton(true)
+      setLeftButton(true);
     }
   };
 
-  let getStartingPosition = (displaySpritePosition,left) => {
+  let getStartingPosition = (displaySpritePosition, left) => {
     let coordinateX = Math.round(width / 2);
     let coordinateY = Math.round(height / 2);
     if (displaySpritePosition) {
-    
-
       setStartingPosition(startingPosition.concat([coordinateX, coordinateY]));
       gameBoard.current.childNodes[coordinateY - 1].childNodes[
         coordinateX - 1
       ].firstChild.style.backgroundColor = "red";
-    }else if(left>4){
+    } else if (left > 4) {
       // gameBoard.current.childNodes[coordinateY - 1].childNodes[
       //   coordinateX - 1
       // ].firstChild.style.left=left+'px'
-      console.log(spritePosition)
-      getPathToFollow(startingPosition,spritePosition)
-      move(coordinateX,coordinateY)
+      console.log(spritePosition);
+      getPathToFollow(startingPosition, spritePosition);
+      move(coordinateX, coordinateY);
     }
   };
 
   let getSpritePositions = () => {
     if (spritePosition.length > 0) {
-      console.log(spritePosition);
-      console.log(startingPosition);
-      // spritePosition.map(point=>move(startingPosition,point))
     }
   };
-  let move = (coordinateX,coordinateY) => {
-      
-     let start = gameBoard.current.childNodes[coordinateY - 1].childNodes[coordinateX - 1].firstChild.style
+  let move = (coordinateX, coordinateY) => {
+    let start =
+      gameBoard.current.childNodes[coordinateY - 1].childNodes[coordinateX - 1]
+        .firstChild.style;
+    let end =
+      gameBoard.current.childNodes[coordinateY - 1].childNodes[coordinateX - 1]
+        .firstChild.style;
+    let done;
 
     var pos = 0;
-    clearInterval(id);
-    id = setInterval(frame, 10);
+
+    setTimeout(setInterval(frame, 300), 5000);
+    setInterval(frameLeft, 100);
+
+    let pas = 0;
+
     function frame() {
       if (pos == 30) {
         clearInterval(id);
       } else {
-        pos++; 
-        // elem.style.top = pos + 'px'; 
-        start.left = pos + 'px'; 
-        // elem.style.right = pos + 'px'; 
+        pos++;
+        start.top = pos + "px";
+       
       }
+     
     }
-   
-  }
+    function frameLeft() {
+      if (pas == 30) {
+        clearInterval(id);
+      } else {
+        pas++;
+        end.left = pas + "px";
+        
+      }
+     
+    }
+  };
 
-   
-  // };
+
   getSpritePositions();
+
+  let id = null;
   
-  let id = null
-  // function myMove() {
-  //   // var elem = document.getElementById("myAnimation");   
-  //   var pos = 0;
-  //   clearInterval(id);
-  //   id = setInterval(frame, 10);
-  //   function frame() {
-  //     if (pos == 350) {
-  //       clearInterval(id);
-  //     } else {
-  //       pos++; 
-  //       elem.style.top = pos + 'px'; 
-  //       elem.style.left = pos + 'px'; 
-  //       elem.style.right = pos + 'px'; 
-  //     }
-  //   }
-  // }
+  let getPathToFollow = (currentPosition, points) => {
+    let currentPoint = [...currentPosition];
+    let path = [];
+    let moveX = {
+      steps: "",
+      direction: "",
+    };
 
+    let moveY = {
+      steps: "",
+      direction: "",
+    };
 
- let  getPathToFollow=(currentPosition,points)=>{
-           let currentPoint = [...currentPosition]
-           let path = [];
-           let moveX ={
-              steps:'',
-              direction:''
-           }
+    let count = 0;
 
-           let moveY ={
-            steps:'',
-            direction:''
-         }
+    points.map((point) => {
+     
+      if (currentPoint[0] < point[0]) {
+        let steps = point[0] - currentPoint[0];
+        let direction = "right";
 
-         let count = 0
+        moveX.steps = steps;
+        moveX.direction = direction;
+       
+      }
 
-         console.log(currentPosition,points)
-          //  let [locatnX,locatnY]=currentPoint;
-          //  console.log(locatnX,'current')
-           points.map(point=>{
-               console.log(currentPoint[0],'here X')
-               console.log(currentPoint[1],'here Y')
-               console.log(point[0],'dest Y')
-               if (currentPoint[0] < point[0]) {
-              
-                  let steps = point[0] - currentPoint[0];
-                  let direction = 'right';
+      if (currentPoint[0] > point[0]) {
+        let steps = currentPoint[0] - point[0];
+        let direction = "left";
 
-                  moveX.steps = steps;
-                  moveX.direction = direction
-                  console.log(points)
-                  console.log(moveX,'right')
-               }
-
-               if (currentPoint[0] > point[0]) {
-                let steps = currentPoint[0] - point[0];
-                let direction = 'left';
-
-                moveX.steps = steps;
-                moveX.direction = direction
-                console.log(points)
-                  console.log(moveX,'left')
-               }
-
-               if (currentPoint[0] === point[0]) {
-                let steps = 0;
-                let direction = 'none';
-
-                moveX.steps = steps;
-                moveX.direction = direction
-                console.log(points)
-                  console.log(moveX,'none X')
-               }
-
-
-             if (currentPoint[1] < point[1]) {
-              let steps = point[1] - currentPoint[1];
-              let direction = 'down';
-
-              moveY.steps = steps;
-              moveY.direction = direction
-              console.log(points)
-                  console.log(moveY,'down')
-             }
-
-             if (currentPoint[1] > point[1]) {
-              let steps = currentPoint[1] - point[1];
-              let direction = 'top';
-
-              moveY.steps = steps;
-              moveY.direction = direction
-              console.log(points)
-                  console.log(moveY,'top')
-           }
-
-           if (currentPoint[1] === point[1]) {
-            let steps = 0;
-            let direction = 'none';
-
-            moveY.steps = steps;
-            moveY.direction = direction
-            console.log(points)
-            console.log(moveY,'none Y')
-           }
-           console.log(moveX,moveY,'moves')
-
-           let x ={...moveX}
-           let y ={...moveY}
-           count++
-           path.push([x,y]);
-           console.log(path)
-          //  currentPoint = [point[0],point[1]];
-          currentPoint[0] = point[0];
-          currentPoint[1] = point[1];
-           console.log(currentPoint,'current position')
-        })
-        console.log(currentPoint)
-        console.log(path)
-        return path
-  }
-
-  let goLeft=()=>{
-    if (left>4 && displaySpritePosition) {
-    //   gameBoard.current.childNodes[5].childNodes[5].firstChild.style.backgroundColor='green'
-    // gameBoard.current.childNodes[5].childNodes[5].firstChild.style.left=left+'px'
-
-    
-    
-    }
-  }
-
-  let moveLeft=()=>{
-    // console.log(gameBoard.current.childNodes[5].childNodes[5].firstChild.style,'Check')
-  setLeft(left+1)
+        moveX.steps = steps;
+        moveX.direction = direction;
       
-         
-   
+      }
+
+      if (currentPoint[0] === point[0]) {
+        let steps = 0;
+        let direction = "none";
+
+        moveX.steps = steps;
+        moveX.direction = direction;
+      
+      }
+
+      if (currentPoint[1] < point[1]) {
+        let steps = point[1] - currentPoint[1];
+        let direction = "down";
+
+        moveY.steps = steps;
+        moveY.direction = direction;
+       
+      }
+
+      if (currentPoint[1] > point[1]) {
+        let steps = currentPoint[1] - point[1];
+        let direction = "top";
+
+        moveY.steps = steps;
+        moveY.direction = direction;
+        
+      }
+
+      if (currentPoint[1] === point[1]) {
+        let steps = 0;
+        let direction = "none";
+
+        moveY.steps = steps;
+        moveY.direction = direction;
+      
+      }
+      console.log(moveX, moveY, "moves");
+
+      let x = { ...moveX };
+      let y = { ...moveY };
+      count++;
+      path.push([x, y]);
+     
+      currentPoint[0] = point[0];
+      currentPoint[1] = point[1];
+      
+    });
     
-    
-}
+    return path;
+  };
+
+  let goLeft = () => {
+    if (left > 4 && displaySpritePosition) {
+      //   gameBoard.current.childNodes[5].childNodes[5].firstChild.style.backgroundColor='green'
+      // gameBoard.current.childNodes[5].childNodes[5].firstChild.style.left=left+'px'
+    }
+  };
+
+  let moveLeft = () => {
+    // console.log(gameBoard.current.childNodes[5].childNodes[5].firstChild.style,'Check')
+    setLeft(left + 1);
+  };
 
   return (
     <div className="App">
